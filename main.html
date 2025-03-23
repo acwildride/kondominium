@@ -1,0 +1,130 @@
+
+        <!DOCTYPE html>
+        <html>
+
+        <head>
+            <title>Agatha</title>
+                
+            <style>
+                body {
+                    background-color: black;
+                    color: white;
+                    font-family: Calibri, sans-serif;
+                    margin: 0;
+                    padding: 0;
+                }
+                h1 {
+                    text-align: left;
+                    font-size: 2em;
+                    margin-top: 20px;
+                    margin-left: 70px;
+                }
+
+                h2 {
+                    text-align: left;
+                    margin-top: 20px;
+                    margin-left: 70px;
+                    font-size: 12px;
+                    color: white;
+                    line-height: 1.5;
+                    white-space: pre-wrap; /* Preserve whitespace and wrap lines */
+                }
+                p#down_left {
+                    position: fixed;
+                    bottom: 30px;
+                    left: 30px;
+                    font-size: 14px;
+                    color: white;
+                    line-height: 1.5;
+                    white-space: pre-wrap;
+                    background-color: rgba(0, 0, 0, 0.25); /* Semi-transparent black */
+                    padding: 5px 50px 10px 1px;  /* Top: px, Right: px, Bottom: px, Left: px */
+                    border-radius: 50px;
+                    border: 1px solid green; /* Highlight the container bounds */
+                }
+                .ul {
+                    list-style-type: none;
+                    margin: 0;
+                    padding: 0;
+                    overflow: hidden;
+                    padding-left: 30px;
+                    padding-right: 30px;
+                }
+                .li {
+                    float: right;
+                    margin-right: 10px;
+                }
+                .li:hover > .sub-menu,
+                    .sub-menu:hover {
+                        display: block;
+                }
+                .sub-menu {
+                    display: none;
+                    list-style-type: none;
+                    padding-left: 15px;
+                }
+                a {
+                    color: white; /* White links */
+                    text-decoration: none; /* Remove underline */
+                    padding: 8px; /* Padding around links */
+                    display: inline-block; /* Ensures padding works */
+                }
+
+                a:hover {
+                    background-color: #444; /* Darken on hover */
+                }
+                .footer {
+                    margin-top: auto; /* Pushes the footer to the bottom of the page */
+                    text-align: center;
+                    padding: 20px;
+                    background-color: #222; /* Dark background for the footer */
+                }
+
+                .footer a {
+                    margin: 0 10px; /* Add spacing between links */
+                }
+                
+            </style>
+            <script>
+                function toggleSubmenu(id) {
+                    var submenu = document.getElementById(id);
+                    if (submenu.style.display === "none") {
+                        submenu.style.display = "block";
+                    } else {
+                        submenu.style.display = "none";
+                    }
+                }
+            </script>
+        </head>
+        <body>
+            <ul class="ul">
+              
+                <li class="li"><a href="stromverbrauch.html">Stromverbrauch</a></li>
+                <li class="li"><a href="gasverbrauch.html">Gasverbrauch</a></li>
+                <li class="li"><a href="oilcontrol.html">Fernablesungen</a></li>
+                
+                <li class="li">
+                    <a href="#" onclick="toggleSubmenu('submenu-23')">Spesenabrechnung</a>
+                    <ul id="submenu-23" class="sub-menu">
+                        <li><a href="kondominiumspesen_2023.html">2023</a></li>
+                        <li><a href="kondominiumspesen_2024.html">2024</a></li>
+                    </ul>
+                </li>
+
+                <li class="li"><a href="main.html">Home</a></li>
+                
+             
+
+            <h1 id="page-title">Kondominium Residence St. Agatha</h1>
+
+            <p id="down_left">
+                
+                Last updated: 23:03:2025 - 22:36
+            </p>
+
+        </body>
+
+        </html>
+
+
+        

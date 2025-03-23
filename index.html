@@ -1,0 +1,48 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Protected Page</title>
+        <style>
+            body {
+                background-color: black;
+                color: white;
+                font-family: Arial, sans-serif;
+                text-align: center;
+                padding-top: 100px;
+            }
+            input {
+                padding: 10px;
+                margin: 10px;
+                font-size: 16px;
+            }
+            button {
+                padding: 10px 20px;
+                font-size: 16px;
+                background-color: white;
+                color: black;
+                border: none;
+                cursor: pointer;
+            }
+            button:hover {
+                background-color: gray;
+            }
+        </style>
+        <script>
+            function checkPassword() {
+                var password = document.getElementById("password").value;
+                if (password === "Agatha") {
+                    window.location.href = "main.html"; // Redirect to your main page
+                } else {
+                    alert("Incorrect password. Try again.");
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <h2>Enter Password</h2>
+        <input type="password" id="password">
+        <button onclick="checkPassword()">Login</button>
+    </body>
+    </html>
+    
