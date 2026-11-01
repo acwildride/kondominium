@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dach Haus A/B</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<style>
+  :root { --bg:#111111; --panel:#1a1a1a; --line:#2a2f3a; --fg:#e8e8e8; --muted:#9aa0a6; --amber:#f5b83d; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font-family:system-ui,-apple-system,"Segoe UI",sans-serif; }
+  .topmenu { background:#1a1a1a; border-bottom:1px solid var(--line); padding:0 16px; position:relative; z-index:20; }
+  .topmenu .ul { list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; justify-content:flex-end; }
+  .topmenu .li { float:none !important; position:relative; }
+  .topmenu a { display:block; color:var(--fg); text-decoration:none; padding:12px 14px; font-size:14px; }
+  .topmenu a:hover { background:#2a2a2a; }
+  .topmenu a.aktiv { background:var(--fg); color:var(--bg); }
+  .topmenu .sub-menu { display:none; position:absolute; right:0; top:100%; list-style:none; margin:0; padding:4px 0;
+                       background:#1a1a1a; border:1px solid var(--line); border-radius:6px; min-width:180px; z-index:30; }
+  .topmenu .sub-menu.open { display:block; }
+  .wrap { max-width:1400px; margin:0 auto; padding:24px 16px 48px; }
+  h1 { font-weight:500; margin:0 0 6px; font-size:26px; }
+  .lead { color:var(--muted); margin:0 0 20px; line-height:1.55; max-width:1100px; }
+  .lead b { color:var(--fg); font-weight:600; }
+  .ctl { display:flex; flex-wrap:wrap; gap:14px 26px; margin-bottom:16px; align-items:flex-end; }
+  .ctl label { display:block; font-size:12px; color:var(--muted); margin-bottom:4px; }
+  .seg { display:inline-flex; flex-wrap:wrap; border:1px solid var(--line); border-radius:6px; overflow:hidden; }
+  .seg button { background:transparent; color:var(--fg); border:0; border-left:1px solid var(--line);
+                padding:6px 11px; font:inherit; font-size:13px; cursor:pointer; }
+  .seg button:first-child { border-left:0; }
+  .seg button.on { background:var(--fg); color:var(--bg); }
+  input[type=range] { width:220px; vertical-align:middle; accent-color:var(--amber); }
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; margin-bottom:18px; }
+  .kpi { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:12px 14px; }
+  .kpi .t { font-size:12px; color:var(--muted); }
+  .kpi .v { font-size:24px; margin:4px 0 2px; font-variant-numeric:tabular-nums; }
+  .kpi .s { font-size:12px; color:var(--muted); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,600px),1fr)); gap:12px; margin-bottom:12px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:14px; min-width:0; margin-bottom:12px; }
+  .grid .card { margin-bottom:0; }
+  .card h2 { font-size:15px; font-weight:500; margin:0 0 4px; }
+  .card p { font-size:12px; color:var(--muted); margin:0 0 8px; line-height:1.45; }
+  .plot { width:100%; height:360px; }
+  #p-3d { height:620px; }
+  .sonnenzeile { font-size:13px; color:var(--muted); margin:6px 0 0; font-variant-numeric:tabular-nums; }
+  .sonnenzeile b { color:var(--fg); font-weight:600; }
+  table { width:100%; border-collapse:collapse; font-size:13px; font-variant-numeric:tabular-nums; }
+  th, td { padding:6px 8px; border-bottom:1px solid var(--line); text-align:right; white-space:nowrap; }
+  th { color:var(--muted); font-weight:500; }
+  td.l, th.l { text-align:left; }
+  tr.sum td { font-weight:700; }
+  tr.aus td { color:#5f6368; }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:6px; vertical-align:-1px; }
+  .scroll { overflow-x:auto; }
+  table.annahmen td { text-align:left; white-space:normal; vertical-align:top; line-height:1.45; font-size:12px; }
+  table.annahmen td:first-child { color:var(--muted); width:24%; min-width:160px; }
+  table.annahmen tr.ah td { color:var(--fg); font-weight:600; font-size:13px; padding-top:14px; }
+  @media (max-width:640px) { #p-3d { height:460px; } input[type=range] { width:160px; } }
+</style></head>
+<body>
+
+<nav class="topmenu">
+  <ul class="ul">
+    <li class="li"><a href="main.html">Home</a></li>
+    <li class="li">
+      <a href="#" onclick="toggleSubmenu('submenu-1'); return false;">Spesenabrechnung</a>
+      <ul id="submenu-1" class="sub-menu">
+        <li><a href="verlauf.html">Verlauf</a></li>
+        <li><a href="kondominiumspesen_2023.html">2023</a></li>
+        <li><a href="kondominiumspesen_2024.html">2024</a></li>
+        <li><a href="kondominiumspesen_2025.html">2025</a></li>
+      </ul>
+    </li>
+    <li class="li"><a href="oilcontrol.html">Fernablesungen</a></li>
+    <li class="li"><a href="gasverbrauch.html">Gasverbrauch</a></li>
+    <li class="li"><a href="stromverbrauch.html">Stromverbrauch</a></li>
+    <li class="li"><a href="strom_gas_preis.html">Strom &amp; Gaspreise</a></li>
+    <li class="li">
+      <a href="#" class="aktiv" onclick="toggleSubmenu('submenu-2'); return false;">PV Sim</a>
+      <ul id="submenu-2" class="sub-menu">
+        <li><a href="sonnenstrahlung.html">Sonnenstrahlung</a></li>
+        <li><a href="dach_kondominium.html" class="aktiv">Dach Haus A/B</a></li>
+        <li><a href="pv_kondominium1.html">Sim 1</a></li>
+        <li><a href="pv_kondominium2.html">Sim 2</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<div class="wrap">
+<h1>Dach Haus A / B – PV-Belegung und Ertrag</h1>
+<p class="lead" id="lead"></p>
+
+<div class="ctl">
+  <div><label>Häuser</label><div class="seg" data-p="haus">
+    <button data-v="B">Haus B</button><button data-v="A">Haus A</button><button data-v="AB">Haus A + B</button></div></div>
+  <div><label>Dachflächen belegen</label><div class="seg" data-p="flaechen">
+    <button data-v="sued">SSO + SW-Walm</button><button data-v="alle">alle vier Flächen</button></div></div>
+  <div><label>Verlegung</label><div class="seg" data-p="verlegung">
+    <button data-v="quer">quer</button><button data-v="hoch">hochkant</button><button data-v="beste">beste je Fläche</button></div></div>
+  <div><label>Randabstand</label><div class="seg" data-p="rand"><button data-v="0.3">30 cm</button><button data-v="0.4">40 cm</button><button data-v="0.5">50 cm</button></div></div>
+  <div><label>Modulleistung</label><div class="seg" data-p="watt"><button data-v="400">400 W</button><button data-v="430">430 W</button><button data-v="450">450 W</button></div></div>
+</div>
+
+<div class="kpis">
+  <div class="kpi"><div class="t">Module</div><div class="v" id="k-mod"></div><div class="s" id="k-mod-s"></div></div>
+  <div class="kpi"><div class="t">Leistung</div><div class="v" id="k-kwp"></div><div class="s" id="k-kwp-s"></div></div>
+  <div class="kpi"><div class="t">Ertrag pro Jahr</div><div class="v" id="k-kwh"></div><div class="s" id="k-kwh-s"></div></div>
+  <div class="kpi"><div class="t">Spezifischer Ertrag</div><div class="v" id="k-spez"></div><div class="s">kWh je kWp und Jahr</div></div>
+  <div class="kpi"><div class="t">Je Wohnung</div><div class="v" id="k-wohn"></div><div class="s" id="k-wohn-s"></div></div>
+  <div class="kpi"><div class="t">Winterhalbjahr</div><div class="v" id="k-wint"></div><div class="s">Anteil Okt–Mär am Jahresertrag</div></div>
+</div>
+
+<div class="card"><h2>3D-Modell mit Bergkulisse und Sonnenbahnen</h2>
+  <p>Ziehen zum Drehen, Mausrad zum Zoomen. Dachflächen nach Jahresertrag eingefärbt oder nach der Sonne zum gewählten Zeitpunkt.
+     Der Ring zeigt den echten Horizont (PVGIS, Höhe 1,5-fach überhöht), die Bögen die Sonnenbahn am 21. Juni, 21. März/September und 21. Dezember.</p>
+  <div class="ctl" style="margin-bottom:6px">
+    <div><label>Färbung</label><div class="seg" data-p="farbe">
+      <button data-v="ertrag">Jahresertrag</button><button data-v="sonne">Sonne jetzt</button></div></div>
+    <div><label>Tag: <b id="tagL"></b></label><input type="range" id="tag" min="1" max="365" step="1"></div>
+    <div><label>Uhrzeit (MEZ): <b id="zeitL"></b></label><input type="range" id="zeit" min="5" max="20" step="0.25"></div>
+    <div><label>Animation</label><div class="seg"><button id="play">▶ Tag abspielen</button></div></div>
+  </div>
+  <div id="p-3d"></div>
+  <p class="sonnenzeile" id="sonnenzeile"></p>
+</div>
+
+<div class="grid">
+  <div class="card"><h2>Dachplan von oben (Norden oben)</h2>
+    <p>Modulbelegung je Dachfläche in echter Ausrichtung; Zahlen = Module auf der Fläche.</p>
+    <div id="p-plan" class="plot" style="height:420px"></div></div>
+  <div class="card"><h2>Ertrag je kWp und Monat (PVGIS, mit Horizont)</h2>
+    <p>Gleiche Anlage (1 kWp, 22°) auf den vier Dachflächen. Im Winter liefert SSO fünfmal so viel wie NNW.</p>
+    <div id="p-spez" class="plot" style="height:420px"></div></div>
+  <div class="card"><h2>Monatsertrag der gewählten Belegung</h2>
+    <p>Gestapelt nach Dachfläche; Linie: Anteil SSO-Fläche am Monatsertrag (rechte Achse).</p>
+    <div id="p-monat" class="plot"></div></div>
+  <div class="card"><h2>Horizont, Sonnenbahnen und Dachausrichtung</h2>
+    <p>Grau: Bergkulisse (PVGIS). Gelb: Sonnenbahnen am 21. jedes Monats, Punkte = volle Stunden (MEZ). Senkrechte Linien: Blickrichtung der Dachflächen.</p>
+    <div id="p-hor" class="plot"></div></div>
+</div>
+
+<div class="card"><h2>Dachflächen im Überblick</h2>
+  <div class="scroll"><table><thead><tr><th class="l">Fläche</th><th>Blickrichtung</th><th>Dachfläche</th><th>Module</th><th>Reihen</th>
+    <th>Verlegung</th><th>kWp</th><th>kWh/kWp</th><th>kWh/Jahr</th><th>Dezember</th><th>Juni</th><th>Anteil</th></tr></thead>
+    <tbody id="tab"></tbody></table></div></div>
+
+<div class="card" id="annahmen"><h2>Annahmen</h2><div class="scroll"><table class="annahmen"><tr class="ah"><td colspan="2">Gebäude und Dach</td></tr><tr><td>Haus B</td><td>24,84 × 10,40 m Außenmaß, Traufhöhe 9,0 m (geschätzt, nur für das 3D-Bild), 5 Wohnungen – Plan Haus 2: 8,22 + 8,40 + 8,22 m × 10,40 m</td></tr><tr><td>Haus A</td><td>24,84 × 10,40 m Außenmaß, Traufhöhe 9,0 m (geschätzt, nur für das 3D-Bild), 6 Wohnungen – Annahme: wie Haus B, nordöstlich anschließend (Fuge 3,90 m) – bitte prüfen</td></tr><tr><td>Dachform</td><td>Walmdach, alle vier Flächen 22° (aus Fotos geschätzt), bündig ohne Dachüberstand; First = Länge − Breite; Grate im Grundriss unter 45°</td></tr><tr><td>Ausrichtung</td><td>Längsachse 57° / 237° (Kompass iPhone 58°, Gegenprobe über Sonnenstand 55°); Längsseite SSO 147°, Walm SW 237°, Walm NO 57°, Längsseite NNW 327°</td></tr><tr class="ah"><td colspan="2">Module und Belegung</td></tr><tr><td>Modul</td><td>1,722 × 1,134 m, 400, 430, 450 Wp wählbar, Fuge 2 cm</td></tr><tr><td>Belegung</td><td>Reihen parallel zur Traufe, jede Reihe so lang, wie es die Grate an ihrer Oberkante zulassen, mittig gesetzt; Randabstand zu Traufe, First und Graten wählbar (zu den Graten ×1,2 im Grundriss); „beste“ wählt je Fläche quer oder hochkant, je nachdem was mehr Module ergibt</td></tr><tr><td>Nicht berücksichtigt</td><td>Kamine, Lüftungsrohre, Dachfenster, Sat-Schüssel, Schneefang, Blitzschutz, Abstandsregeln des Installateurs; gegenseitige Verschattung der Walme von Haus A und B über die 3,90-m-Fuge; Bäume</td></tr><tr class="ah"><td colspan="2">Ertrag</td></tr><tr><td>PVGIS</td><td>SARAH3, kristallines Silizium, 1 kWp, 14 % Systemverluste, Neigung 22°, Horizont aus Geländemodell; Monatswerte: Längsseite SSO (-33°): PVdata_46.619_11.156_SA3_crystSi_1kWp_14_22deg_-33deg.csv; Walm SW (57°): PVdata_46.619_11.156_SA3_crystSi_1kWp_14_22deg_57deg.csv; Walm NO (-123°): PVdata_46.619_11.156_SA3_crystSi_1kWp_14_22deg_-123deg.csv; Längsseite NNW (147°): PVdata_46.619_11.156_SA3_crystSi_1kWp_14_22deg_147deg.csv</td></tr><tr><td>Horizont</td><td>PVGIS-Horizontprofil 46,619 N / 11,156 O (horizon_46.619_11.156.csv); bestätigt durch Fotos und Beobachtung (21.12.: Sonne gegen 14 Uhr hinter der Völlaner Seite, 21.06.: ca. 18:45 MEZ hinter dem Vigiljoch; 01.11.2026 erster Strahl 08:00)</td></tr><tr><td>Sonnenstand (Grafiken)</td><td>Näherung mit Zeitgleichung und Deklination, Zeiten in MEZ (UTC+1) ohne Sommerzeit</td></tr><tr class="ah"><td colspan="2">Grenzen</td></tr><tr><td>Genauigkeit</td><td>Modulzahlen ±10 % (Dachaufbauten, Randabstände), Erträge ±5–10 % (Jahr zu Jahr, Neigung geschätzt); keine Moduldegradation, keine Abregelung</td></tr><tr><td>Erstellt</td><td>01.11.2026 18:43 · Planungshilfe, kein Angebot</td></tr></table></div></div>
+</div>
+
+<script>
+function toggleSubmenu(id) { const el = document.getElementById(id); if (el) el.classList.toggle('open'); }
+const DAT = {"breite":46.619,"laenge":11.156,"neigung":22,"achse":57,"modul":[1.722,1.134],"fuge":0.02,"haeuser":[{"id":"B","name":"Haus B","L":24.84,"B":10.4,"traufe":9.0,"versatz":0.0,"wohnungen":5},{"id":"A","name":"Haus A","L":24.84,"B":10.4,"traufe":9.0,"versatz":28.74,"wohnungen":6}],"flaechen":[{"id":"sso","name":"L\u00e4ngsseite SSO","az":147,"farbe":"#f5b83d"},{"id":"sw","name":"Walm SW","az":237,"farbe":"#ef8a3d"},{"id":"no","name":"Walm NO","az":57,"farbe":"#19d3f3"},{"id":"nnw","name":"L\u00e4ngsseite NNW","az":327,"farbe":"#636efa"}],"pv":{"sso":[67.1,86.03,119.33,127.21,136.12,144.93,149.97,135.24,111.96,86.49,58.1,56.85],"sw":[49.03,75.05,108.97,119.81,128.05,135.8,139.11,127.18,103.21,79.28,47.08,42.75],"no":[23.02,40.08,76.6,100.93,120.9,133.61,135.23,111.1,79.19,48.12,24.23,17.04],"nnw":[12.6,27.65,63.95,91.71,112.47,123.92,123.85,102.25,68.67,38.66,16.18,10.31]},"horizont":[[0.0,8.4],[7.5,5.7],[15.0,4.6],[22.5,5.0],[30.0,6.9],[37.5,9.2],[45.0,10.7],[52.5,11.8],[60.0,10.7],[67.5,11.8],[75.0,13.4],[82.5,13.8],[90.0,13.0],[97.5,11.8],[105.0,10.7],[112.5,8.4],[120.0,8.0],[127.5,6.5],[135.0,4.2],[142.5,2.7],[150.0,1.9],[157.5,2.3],[165.0,6.1],[172.5,7.3],[180.0,8.4],[187.5,11.8],[195.0,10.3],[202.5,11.1],[210.0,15.3],[217.5,16.8],[225.0,15.3],[232.5,10.7],[240.0,8.4],[247.5,9.2],[255.0,11.5],[262.5,14.9],[270.0,16.4],[277.5,19.1],[285.0,21.4],[292.5,21.4],[300.0,19.1],[307.5,17.2],[315.0,16.0],[322.5,13.0],[330.0,10.7],[337.5,10.3],[345.0,9.5],[352.5,9.2],[360.0,8.4]],"beob":[["2026-11-01","08:00","erster Sonnenstrahl"]],"start":{"flaechen":"sued","verlegung":"beste","rand":0.4,"watt":430,"tag":305,"zeit":11.0}};
+const F = DAT.flaechen, HAEUSER = DAT.haeuser, PV = DAT.pv, HOR = DAT.horizont;
+const S = { haus:'B', flaechen:DAT.start.flaechen, verlegung:DAT.start.verlegung, rand:DAT.start.rand, watt:DAT.start.watt,
+            farbe:'ertrag', tag:DAT.start.tag, zeit:DAT.start.zeit };
+const nf = (d) => new Intl.NumberFormat('de-DE', { minimumFractionDigits:d, maximumFractionDigits:d });
+const M = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+const RAD = Math.PI / 180, BETA = DAT.neigung * RAD, CB = Math.cos(BETA), SB = Math.sin(BETA);
+const LAY0 = { paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)', font:{ color:'#e8e8e8', size:12 },
+  hoverlabel:{ bgcolor:'#2a2a2a', bordercolor:'#555555', font:{ color:'#e8e8e8' } },
+  margin:{ l:56, r:16, t:10, b:40 }, legend:{ orientation:'h', y:1.14, x:0 }, hovermode:'x unified', separators:',.',
+  xaxis:{ gridcolor:'#2a2f3a', zeroline:false }, yaxis:{ gridcolor:'#2a2f3a', zeroline:false } };
+const LAY = () => JSON.parse(JSON.stringify(LAY0));
+const CFG = { displayModeBar:false, responsive:true };
+const jahr = (id) => PV[id].reduce((a, b) => a + b, 0);
+
+// ---------- Sonnenstand (Zeitgleichung, Deklination), Zeit in MEZ ----------
+function sonne(n, std) {
+  const B = 2 * Math.PI * (n - 81) / 364;
+  const eot = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
+  const d = 23.45 * Math.sin(2 * Math.PI * (284 + n) / 365) * RAD, phi = DAT.breite * RAD;
+  const w = 15 * (std + (4 * (DAT.laenge - 15) + eot) / 60 - 12) * RAD;
+  const sel = Math.sin(phi) * Math.sin(d) + Math.cos(phi) * Math.cos(d) * Math.cos(w);
+  const el = Math.asin(sel) / RAD;
+  let az = Math.atan2(Math.sin(w), Math.cos(w) * Math.sin(phi) - Math.tan(d) * Math.cos(phi)) / RAD + 180;
+  return { el: el + (el > -1 ? 1.02 / Math.tan((el + 10.3 / (el + 5.11)) * RAD) / 60 : 0), az: (az + 360) % 360 };
+}
+function horizont(az) {
+  az = ((az % 360) + 360) % 360;
+  for (let i = 1; i < HOR.length; i++) if (az <= HOR[i][0]) {
+    const [a0, h0] = HOR[i - 1], [a1, h1] = HOR[i]; return h0 + (h1 - h0) * (az - a0) / (a1 - a0);
+  }
+  return HOR[HOR.length - 1][1];
+}
+const datum = (n) => { const d = new Date(2026, 0, n); return d.toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit' }); };
+const hhmm = (h) => String(Math.floor(h)).padStart(2, '0') + ':' + String(Math.round(h % 1 * 60) % 60).padStart(2, '0');
+
+// ---------- Geometrie und Belegung ----------
+// Fläche: (u entlang Traufe, d schräg ab Traufe) → lokal (a entlang Achse ab SW-Ende, b quer, + = SSO, z)
+function punkt(f, h, u, d) {
+  const p = d * CB, z = h.traufe + d * SB;
+  if (f === 'sso') return [u, h.B / 2 - p, z];
+  if (f === 'nnw') return [u, -(h.B / 2 - p), z];
+  if (f === 'sw') return [p, u - h.B / 2, z];
+  return [h.L - p, u - h.B / 2, z];
+}
+function belege(f, h, ori) {
+  const s = (h.B / 2) / CB, len = (f === 'sso' || f === 'nnw') ? h.L : h.B, e = S.rand, g = DAT.fuge;
+  const mh = ori === 'hoch' ? DAT.modul[0] : DAT.modul[1], mw = ori === 'hoch' ? DAT.modul[1] : DAT.modul[0];
+  const reihen = [], mod = [];
+  for (let d = e; d + mh <= s - e + 1e-9; d += mh + g) {
+    const p = (d + mh) * CB, u0 = p + e * 1.2, u1 = len - p - e * 1.2;
+    const k = Math.max(0, Math.floor((u1 - u0 + g) / (mw + g)));
+    if (!k) break;
+    reihen.push(k);
+    const breite = k * mw + (k - 1) * g, start = len / 2 - breite / 2;
+    for (let i = 0; i < k; i++) mod.push([start + i * (mw + g), d, mw, mh]);
+  }
+  return { n: mod.length, reihen, mod, ori };
+}
+function belegung(f, h) {
+  if (S.verlegung !== 'beste') return belege(f, h, S.verlegung);
+  const q = belege(f, h, 'quer'), k = belege(f, h, 'hoch');
+  return k.n > q.n ? k : q;
+}
+const aktiv = (f) => S.flaechen === 'alle' || f === 'sso' || f === 'sw';
+const haeuser = () => HAEUSER.filter((h) => S.haus === 'AB' || h.id === S.haus);
+function rechne() {
+  const R = { haus: {}, fl: {} };
+  F.forEach((f) => { R.fl[f.id] = { n:0, kwp:0, kwh:0, mon:new Array(12).fill(0), m2:0, reihen:[], ori:new Set() }; });
+  HAEUSER.forEach((h) => {
+    R.haus[h.id] = {};
+    F.forEach((f) => {
+      const b = belegung(f.id, h);
+      R.haus[h.id][f.id] = b;
+      if (!haeuser().includes(h)) return;
+      const s = (h.B / 2) / CB, flaeche = (f.id === 'sso' || f.id === 'nnw') ? (h.L + h.L - h.B) / 2 * s : h.B * s / 2;
+      const x = R.fl[f.id]; x.m2 += flaeche;
+      if (!aktiv(f.id)) return;
+      const kwp = b.n * S.watt / 1000;
+      x.n += b.n; x.kwp += kwp; x.reihen.push(b.reihen.join('+')); x.ori.add(b.ori);
+      PV[f.id].forEach((v, m) => { x.mon[m] += v * kwp; });
+      x.kwh += kwp * jahr(f.id);
+    });
+  });
+  R.n = F.reduce((a, f) => a + R.fl[f.id].n, 0);
+  R.kwp = F.reduce((a, f) => a + R.fl[f.id].kwp, 0);
+  R.kwh = F.reduce((a, f) => a + R.fl[f.id].kwh, 0);
+  R.mon = M.map((_, m) => F.reduce((a, f) => a + R.fl[f.id].mon[m], 0));
+  R.wohn = haeuser().reduce((a, h) => a + h.wohnungen, 0);
+  return R;
+}
+
+// ---------- lokal → Welt (Ost, Nord) ----------
+const AX = [Math.sin(DAT.achse * RAD), Math.cos(DAT.achse * RAD)], QB = [Math.sin((DAT.achse + 90) * RAD), Math.cos((DAT.achse + 90) * RAD)];
+const MITTE = (() => { const a0 = Math.min(...HAEUSER.map((h) => h.versatz)), a1 = Math.max(...HAEUSER.map((h) => h.versatz + h.L)); return (a0 + a1) / 2; })();
+function welt(h, [a, b, z]) { const A = h.versatz + a - MITTE; return [A * AX[0] + b * QB[0], A * AX[1] + b * QB[1], z]; }
+
+// ---------- Farben ----------
+function mix(c1, c2, t) {
+  const p = (c) => c[0] === '#' ? [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16)) : c.match(/\d+/g).slice(0, 3).map(Number);
+  const a = p(c1), b = p(c2); t = Math.max(0, Math.min(1, t));
+  return 'rgb(' + a.map((x, i) => Math.round(x + (b[i] - x) * t)).join(',') + ')';
+}
+const JMIN = Math.min(...F.map((f) => jahr(f.id))), JMAX = Math.max(...F.map((f) => jahr(f.id)));
+const ertragFarbe = (id) => mix('#3b4a6b', '#f5b83d', (jahr(id) - JMIN * 0.9) / (JMAX - JMIN * 0.9));
+function cosEinfall(f, so) {
+  const az = F.find((x) => x.id === f).az * RAD, n = [SB * Math.sin(az), SB * Math.cos(az), CB];
+  const e = so.el * RAD, s = [Math.cos(e) * Math.sin(so.az * RAD), Math.cos(e) * Math.cos(so.az * RAD), Math.sin(e)];
+  return n[0] * s[0] + n[1] * s[1] + n[2] * s[2];
+}
+
+// ---------- 3D ----------
+const R3 = 42, UEBERH = 1.5;
+let kamera = null;
+function drei(R) {
+  const so = sonne(S.tag, S.zeit), sichtbar = so.el > horizont(so.az);
+  const T = [];
+  const mesh = (pts, tri, farbe, name, opa = 1, hover = null) => T.push({ type:'mesh3d', x:pts.map((p) => p[0]), y:pts.map((p) => p[1]), z:pts.map((p) => p[2]),
+    i:tri.map((t) => t[0]), j:tri.map((t) => t[1]), k:tri.map((t) => t[2]), color:farbe, opacity:opa, flatshading:true, name, showscale:false,
+    lighting:{ ambient:0.65, diffuse:0.6, specular:0.08, roughness:0.9 }, lightposition:{ x:-100, y:-200, z:300 },
+    hovertemplate: hover ? hover + '<extra></extra>' : '<extra></extra>', hoverinfo: hover ? undefined : 'skip' });
+  // Boden
+  const bod = [], btr = [];
+  for (let i = 0; i <= 48; i++) { const w = i / 48 * 2 * Math.PI; bod.push([R3 * Math.sin(w), R3 * Math.cos(w), -0.05]); }
+  bod.push([0, 0, -0.05]); for (let i = 0; i < 48; i++) btr.push([49, i, i + 1]);
+  mesh(bod, btr, '#1d2a1f', 'Boden', 1);
+  // Bergkulisse
+  const rg = [], rtr = [], N = 120;
+  for (let i = 0; i <= N; i++) {
+    const az = i / N * 360, h = R3 * Math.tan(horizont(az) * RAD) * UEBERH;
+    rg.push([R3 * Math.sin(az * RAD), R3 * Math.cos(az * RAD), 0], [R3 * Math.sin(az * RAD), R3 * Math.cos(az * RAD), h]);
+  }
+  for (let i = 0; i < N; i++) { const a = 2 * i; rtr.push([a, a + 1, a + 2], [a + 1, a + 3, a + 2]); }
+  mesh(rg, rtr, '#55606e', 'Horizont', 0.55);
+  T.push({ type:'scatter3d', mode:'lines', x:rg.filter((_, i) => i % 2).map((p) => p[0]), y:rg.filter((_, i) => i % 2).map((p) => p[1]),
+           z:rg.filter((_, i) => i % 2).map((p) => p[2]), line:{ color:'#9ca3af', width:3 }, hoverinfo:'skip', showlegend:false });
+  // Sonnenbahnen
+  [[172, '21.06.'], [80, '21.03./21.09.'], [355, '21.12.']].forEach(([n, lab]) => {
+    const x = [], y = [], z = [], tx = [];
+    for (let t = 3; t <= 21; t += 0.1) {
+      const s = sonne(n, t); if (s.el < 0) continue;
+      const e = s.el * RAD, r = R3 * Math.cos(e);
+      x.push(r * Math.sin(s.az * RAD)); y.push(r * Math.cos(s.az * RAD)); z.push(R3 * Math.sin(e) * (s.el > horizont(s.az) ? 1 : 1)); tx.push(hhmm(t));
+    }
+    T.push({ type:'scatter3d', mode:'lines', x, y, z, text:tx, line:{ color:'#f5b83d', width:3, dash: n === 80 ? 'dash' : 'solid' },
+             name:lab, hovertemplate:lab + ' %{text}<extra></extra>', showlegend:false });
+  });
+  // Sonne
+  if (so.el > -2) {
+    const e = so.el * RAD, r = R3 * Math.cos(e);
+    T.push({ type:'scatter3d', mode:'markers', x:[r * Math.sin(so.az * RAD)], y:[r * Math.cos(so.az * RAD)], z:[R3 * Math.sin(e)],
+             marker:{ size:9, color: sichtbar ? '#ffd54a' : '#6b7280', line:{ color:'#fff3c4', width:2 } },
+             hovertemplate:`Sonne ${hhmm(S.zeit)}: Azimut ${nf(0).format(so.az)}°, Höhe ${nf(1).format(so.el)}°<extra></extra>`, showlegend:false });
+  }
+  // Himmelsrichtungen
+  const NSEW = [['N', 0], ['O', 90], ['S', 180], ['W', 270]];
+  T.push({ type:'scatter3d', mode:'text', x:NSEW.map(([, a]) => (R3 + 6) * Math.sin(a * RAD)), y:NSEW.map(([, a]) => (R3 + 6) * Math.cos(a * RAD)),
+           z:NSEW.map(() => 1), text:NSEW.map(([t]) => t), textfont:{ color:'#e8e8e8', size:16 }, hoverinfo:'skip', showlegend:false });
+  // Häuser
+  const ml = { x:[], y:[], z:[] }, mm = { p:[], t:[] };
+  HAEUSER.forEach((h) => {
+    const an = haeuser().includes(h);
+    const ecke = [[0, -h.B / 2], [h.L, -h.B / 2], [h.L, h.B / 2], [0, h.B / 2]];
+    const wp = [], wt = [];
+    ecke.forEach(([a, b]) => { wp.push(welt(h, [a, b, 0])); }); ecke.forEach(([a, b]) => { wp.push(welt(h, [a, b, h.traufe])); });
+    for (let i = 0; i < 4; i++) { const j = (i + 1) % 4; wt.push([i, j, 4 + j], [i, 4 + j, 4 + i]); }
+    mesh(wp, wt, an ? '#d9d6cf' : '#8b8a86', h.name, 1, h.name);
+    const H = h.traufe + h.B / 2 * Math.tan(BETA);
+    const r0 = [h.B / 2, 0, H], r1 = [h.L - h.B / 2, 0, H];
+    const E = ecke.map(([a, b]) => [a, b, h.traufe]);
+    const dach = { sso:[E[3], E[2], r1, r0], nnw:[E[0], E[1], r1, r0], sw:[E[0], E[3], r0], no:[E[1], E[2], r1] };
+    F.forEach((f) => {
+      const p = dach[f.id].map((q) => welt(h, q)), tri = p.length === 4 ? [[0, 1, 2], [0, 2, 3]] : [[0, 1, 2]];
+      let farbe = ertragFarbe(f.id), info = `${h.name} · ${f.name}: ${nf(0).format(jahr(f.id))} kWh/kWp`;
+      if (S.farbe === 'sonne') {
+        const c = sichtbar ? Math.max(0, cosEinfall(f.id, so)) : 0;
+        farbe = mix('#2b2f36', '#ffcf4a', c); info = `${h.name} · ${f.name}: ${sichtbar && c > 0 ? 'Einstrahlung ' + Math.round(c * 100) + ' % der senkrechten' : 'keine Direktsonne'}`;
+      }
+      if (!an) farbe = mix(farbe, '#444444', 0.6);
+      mesh(p, tri, farbe, f.name, 1, info);
+      // Module
+      const b = R.haus[h.id][f.id];
+      if (!an || !aktiv(f.id)) return;
+      b.mod.forEach(([u, d, w, hh]) => {
+        const q = [punkt(f.id, h, u, d), punkt(f.id, h, u + w, d), punkt(f.id, h, u + w, d + hh), punkt(f.id, h, u, d + hh)]
+          .map((x) => welt(h, [x[0], x[1], x[2] + 0.06]));
+        const o = mm.p.length; mm.p.push(...q); mm.t.push([o, o + 1, o + 2], [o, o + 2, o + 3]);
+        q.concat([q[0]]).forEach((x) => { ml.x.push(x[0]); ml.y.push(x[1]); ml.z.push(x[2] + 0.01); });
+        ml.x.push(null); ml.y.push(null); ml.z.push(null);
+      });
+    });
+    // First und Grate
+    const kante = [[E[0], r0], [E[3], r0], [r0, r1], [r1, E[1]], [r1, E[2]], [E[0], E[1]], [E[1], E[2]], [E[2], E[3]], [E[3], E[0]]];
+    const kx = [], ky = [], kz = [];
+    kante.forEach(([p, q]) => { [p, q].forEach((x) => { const w = welt(h, x); kx.push(w[0]); ky.push(w[1]); kz.push(w[2] + 0.02); }); kx.push(null); ky.push(null); kz.push(null); });
+    T.push({ type:'scatter3d', mode:'lines', x:kx, y:ky, z:kz, line:{ color:'#1f1f1f', width:4 }, hoverinfo:'skip', showlegend:false });
+  });
+  if (mm.p.length) {
+    mesh(mm.p, mm.t, S.farbe === 'sonne' ? '#24364f' : '#1b2b44', 'Module', 1, 'PV-Modul');
+    T.push({ type:'scatter3d', mode:'lines', x:ml.x, y:ml.y, z:ml.z, line:{ color:'#8aa4c8', width:1.5 }, hoverinfo:'skip', showlegend:false });
+  }
+  const ax = { visible:false, showgrid:false, zeroline:false, showbackground:false };
+  const lay = { paper_bgcolor:'rgba(0,0,0,0)', margin:{ l:0, r:0, t:0, b:0 }, showlegend:false, uirevision:'fest',
+    scene:{ xaxis:{ ...ax, range:[-R3 - 8, R3 + 8] }, yaxis:{ ...ax, range:[-R3 - 8, R3 + 8] }, zaxis:{ ...ax, range:[-1, R3 * 0.95] },
+            aspectmode:'manual', aspectratio:{ x:1, y:1, z:(R3 * 0.95 + 1) / (2 * R3 + 16) },
+            camera: kamera || { eye:{ x:0.40, y:-0.78, z:0.48 }, center:{ x:0, y:0, z:-0.14 } }, dragmode:'orbit' } };
+  Plotly.react('p-3d', T, lay, { ...CFG, scrollZoom:true });
+  // Sonnenzeile
+  const zeilen = [];
+  for (let t = 4; t <= 21; t += 1 / 60) { const s = sonne(S.tag, t); if (s.el + 0.27 > horizont(s.az)) zeilen.push(t); }
+  const frei = []; for (let t = 4; t <= 21; t += 1 / 60) if (sonne(S.tag, t).el > -0.83) frei.push(t);
+  document.getElementById('sonnenzeile').innerHTML =
+    `<b>${datum(S.tag)} ${hhmm(S.zeit)} MEZ</b> · Sonne Azimut ${nf(0).format(so.az)}°, Höhe ${nf(1).format(so.el)}° · Horizont dort ${nf(1).format(horizont(so.az))}° → ` +
+    (so.el < 0 ? 'Nacht' : sichtbar ? '<b style="color:#f5b83d">Sonne am Dach</b>' : 'Sonne hinter dem Berg') +
+    (zeilen.length ? ` · Direktsonne am Dach ${hhmm(zeilen[0])}–${hhmm(zeilen[zeilen.length - 1])} (${nf(1).format(zeilen.length / 60)} h)` : ' · heute keine Direktsonne') +
+    (frei.length ? `, astronomisch ${hhmm(frei[0])}–${hhmm(frei[frei.length - 1])}` : '');
+}
+document.getElementById('p-3d').addEventListener('plotly_relayout', (e) => { if (e && e['scene.camera']) kamera = e['scene.camera']; });
+
+// ---------- Dachplan ----------
+function plan(R) {
+  const T = [], ann = [];
+  HAEUSER.forEach((h) => {
+    const an = haeuser().includes(h);
+    const E = [[0, -h.B / 2, 0], [h.L, -h.B / 2, 0], [h.L, h.B / 2, 0], [0, h.B / 2, 0]];
+    const r0 = [h.B / 2, 0, 0], r1 = [h.L - h.B / 2, 0, 0];
+    const dach = { sso:[E[3], E[2], r1, r0], nnw:[E[0], E[1], r1, r0], sw:[E[0], E[3], r0], no:[E[1], E[2], r1] };
+    F.forEach((f) => {
+      const p = dach[f.id].concat([dach[f.id][0]]).map((q) => welt(h, q));
+      T.push({ type:'scatter', mode:'lines', x:p.map((q) => q[0]), y:p.map((q) => q[1]), fill:'toself',
+               fillcolor: an ? mix(ertragFarbe(f.id), '#1a1a1a', 0.55) : '#232323', line:{ color:'#3a3f4a', width:1 },
+               hovertemplate:`${h.name} · ${f.name} (${f.az}°)<br>${nf(0).format(jahr(f.id))} kWh/kWp<extra></extra>`, showlegend:false });
+      const b = R.haus[h.id][f.id];
+      if (an && aktiv(f.id) && b.n) {
+        const x = [], y = [];
+        b.mod.forEach(([u, d, w, hh]) => {
+          [[u, d], [u + w, d], [u + w, d + hh], [u, d + hh], [u, d]].forEach(([uu, dd]) => { const q = welt(h, punkt(f.id, h, uu, dd)); x.push(q[0]); y.push(q[1]); });
+          x.push(null); y.push(null);
+        });
+        T.push({ type:'scatter', mode:'lines', x, y, fill:'toself', fillcolor:'#1b2b44', line:{ color:f.farbe, width:1 }, hoverinfo:'skip', showlegend:false });
+        const m = dach[f.id].reduce((a, q) => [a[0] + q[0] / dach[f.id].length, a[1] + q[1] / dach[f.id].length, 0], [0, 0, 0]);
+        const mp = welt(h, m);
+        ann.push({ x:mp[0], y:mp[1], text:`<b>${b.n}</b>`, showarrow:false, font:{ size:13, color:'#ffffff' }, bgcolor:'rgba(17,17,17,0.7)', borderpad:2 });
+      }
+    });
+    const c = welt(h, [h.L / 2, 0, 0]);
+    ann.push({ x:c[0], y:c[1], text:h.name, showarrow:false, yshift:0, font:{ size:11, color: an ? '#e8e8e8' : '#6b7280' }, xanchor:'center', yanchor:'bottom', visible:false });
+    const t = welt(h, [h.L / 2, h.B / 2 + 3, 0]);
+    ann.push({ x:t[0], y:t[1], text:h.name + (an ? '' : ' (aus)'), showarrow:false, font:{ size:12, color: an ? '#e8e8e8' : '#6b7280' } });
+  });
+  ann.push({ xref:'paper', yref:'paper', x:0.02, y:0.98, text:'▲ N', showarrow:false, font:{ size:14, color:'#e8e8e8' } });
+  const lay = LAY();
+  Plotly.react('p-plan', T, { ...lay, hovermode:'closest', margin:{ l:10, r:10, t:10, b:10 },
+    xaxis:{ visible:false, scaleanchor:'y', scaleratio:1 }, yaxis:{ visible:false }, annotations:ann }, CFG);
+}
+
+// ---------- Diagramme ----------
+function diagramme(R) {
+  Plotly.react('p-spez', F.map((f) => ({ type:'scatter', mode:'lines+markers', name:`${f.name} (${nf(0).format(jahr(f.id))})`, x:M, y:PV[f.id],
+    line:{ color:f.farbe, width:2.5 }, hovertemplate:'%{y:.0f} kWh/kWp' })),
+    { ...LAY(), yaxis:{ ...LAY().yaxis, title:'kWh je kWp', rangemode:'tozero' }, legend:{ orientation:'h', y:1.18, x:0 } }, CFG);
+
+  const tr = F.filter((f) => aktiv(f.id)).map((f) => ({ type:'bar', name:f.name, x:M, y:R.fl[f.id].mon, marker:{ color:f.farbe }, hovertemplate:'%{y:,.0f} kWh' }));
+  const anteil = R.mon.map((v, m) => v > 0 ? R.fl.sso.mon[m] / v * 100 : null);
+  tr.push({ type:'scatter', mode:'lines+markers', name:'Anteil SSO %', x:M, y:anteil, yaxis:'y2', line:{ color:'#e8e8e8', width:2, dash:'dot' }, hovertemplate:'%{y:.0f} %' });
+  Plotly.react('p-monat', tr, { ...LAY(), barmode:'stack', yaxis:{ ...LAY().yaxis, title:'kWh' },
+    yaxis2:{ overlaying:'y', side:'right', range:[0, 105], title:'%', showgrid:false }, margin:{ ...LAY().margin, r:48 } }, CFG);
+
+  const H = [{ type:'scatter', mode:'lines', x:HOR.map((p) => p[0]), y:HOR.map((p) => p[1]), fill:'tozeroy', fillcolor:'rgba(75,85,99,0.75)',
+               line:{ color:'#9ca3af', width:1.5 }, name:'Horizont', hovertemplate:'Azimut %{x:.0f}°: Horizont %{y:.1f}°<extra></extra>', showlegend:false }];
+  const ann = [];
+  [[355, '21.12.'], [21, '21.01./21.11.'], [52, '21.02./21.10.'], [80, '21.03./21.09.'], [111, '21.04./21.08.'], [141, '21.05./21.07.'], [172, '21.06.']].forEach(([n, lab]) => {
+    const x = [], y = [], ys = [], tx = [], sx = [], sy = [], st = [];
+    for (let t = 3; t <= 21.01; t += 0.05) {
+      const s = sonne(n, t); if (s.el < -1) continue;
+      x.push(s.az); y.push(s.el); ys.push(s.el > horizont(s.az) ? s.el : null); tx.push(hhmm(t));
+      if (Math.abs(t - Math.round(t)) < 0.01 && s.el > 0) { sx.push(s.az); sy.push(s.el); st.push(hhmm(Math.round(t))); }
+    }
+    H.push({ type:'scatter', mode:'lines', x, y, line:{ color:'#f5b83d', width:1, dash:'dot' }, hoverinfo:'skip', showlegend:false });
+    H.push({ type:'scatter', mode:'lines', x, y:ys, text:tx, line:{ color:'#f5b83d', width:2.2 }, showlegend:false, hovertemplate:`${lab} %{text} – %{y:.1f}°<extra></extra>` });
+    H.push({ type:'scatter', mode:'markers', x:sx, y:sy, text:st, marker:{ color:'#e8e8e8', size:3 }, hoverinfo:'skip', showlegend:false });
+    const i = y.indexOf(Math.max(...y)); ann.push({ x:x[i], y:y[i] + 2.5, text:lab, showarrow:false, font:{ size:10, color:'#cbd5e1' } });
+  });
+  DAT.beob.forEach(([d, t, txt]) => {
+    const dt = new Date(d + 'T' + t), n = Math.round((dt - new Date(dt.getFullYear(), 0, 0)) / 864e5);
+    const som = dt.getTimezoneOffset() === -120 ? 1 : 0, s = sonne(n, +t.slice(0, 2) + t.slice(3) / 60 - som);
+    H.push({ type:'scatter', mode:'markers', x:[s.az], y:[s.el], marker:{ color:'#ef553b', size:10, symbol:'x' }, showlegend:false,
+             hovertemplate:`Beobachtung ${d.split('-').reverse().join('.')} ${t}: ${txt}<extra></extra>` });
+  });
+  const shapes = F.map((f) => ({ type:'line', x0:f.az, x1:f.az, y0:0, y1:72, line:{ color:f.farbe, width:1.5, dash:'dash' } }));
+  F.forEach((f) => ann.push({ x:f.az, y:70, text:f.name.replace('Längsseite ', ''), showarrow:false, font:{ size:11, color:f.farbe }, xanchor:'left', xshift:3 }));
+  [[80, 'Bergkette Ost'], [217, 'Völlaner Gall'], [242, 'Ulten'], [290, 'Vigiljoch']].forEach(([x, t]) => ann.push({ x, y:horizont(x) / 2, text:t, showarrow:false, font:{ size:10, color:'#e5e7eb' } }));
+  Plotly.react('p-hor', H, { ...LAY(), hovermode:'closest', shapes, annotations:ann,
+    xaxis:{ ...LAY().xaxis, title:'Azimut (90 = Ost, 180 = Süd, 270 = West)', range:[30, 340], dtick:30 },
+    yaxis:{ ...LAY().yaxis, title:'Höhe °', range:[0, 72] } }, CFG);
+}
+
+function tabelle(R) {
+  const tb = document.getElementById('tab'); tb.replaceChildren();
+  F.forEach((f) => {
+    const x = R.fl[f.id], tr = document.createElement('tr'); if (!aktiv(f.id)) tr.className = 'aus';
+    const ori = [...x.ori].map((o) => o === 'quer' ? 'quer' : 'hochkant').join('/') || '–';
+    const z = [`<span class="dot" style="background:${f.farbe}"></span>${f.name}`, f.az + '°', nf(0).format(x.m2) + ' m²', aktiv(f.id) ? x.n : '–',
+      aktiv(f.id) ? x.reihen.join(' | ') : '–', aktiv(f.id) ? ori : '–', aktiv(f.id) ? nf(1).format(x.kwp) : '–', nf(0).format(jahr(f.id)),
+      aktiv(f.id) ? nf(0).format(x.kwh) : '–', aktiv(f.id) ? nf(0).format(x.mon[11]) : '–', aktiv(f.id) ? nf(0).format(x.mon[5]) : '–',
+      aktiv(f.id) && R.kwh ? Math.round(x.kwh / R.kwh * 100) + ' %' : '–'];
+    z.forEach((v, i) => { const td = document.createElement('td'); if (i === 0) { td.className = 'l'; td.innerHTML = v; } else td.textContent = v; tr.append(td); });
+    tb.append(tr);
+  });
+  const s = document.createElement('tr'); s.className = 'sum';
+  ['Summe', '', nf(0).format(F.reduce((a, f) => a + R.fl[f.id].m2, 0)) + ' m²', R.n, '', '', nf(1).format(R.kwp), R.kwp ? nf(0).format(R.kwh / R.kwp) : '–',
+   nf(0).format(R.kwh), nf(0).format(R.mon[11]), nf(0).format(R.mon[5]), '100 %'].forEach((v, i) => { const td = document.createElement('td'); td.textContent = v; if (!i) td.className = 'l'; s.append(td); });
+  tb.append(s);
+}
+
+function zeichne(nur3d) {
+  document.querySelectorAll('.seg[data-p]').forEach((g) => g.querySelectorAll('button').forEach((b) => b.classList.toggle('on', String(S[g.dataset.p]) === b.dataset.v)));
+  document.getElementById('tagL').textContent = datum(S.tag);
+  document.getElementById('zeitL').textContent = hhmm(S.zeit);
+  const R = rechne();
+  drei(R);
+  if (nur3d) return;
+  const wint = [0, 1, 2, 9, 10, 11].reduce((a, m) => a + R.mon[m], 0);
+  const hs = haeuser().map((h) => h.name).join(' + ');
+  document.getElementById('k-mod').textContent = R.n;
+  document.getElementById('k-mod-s').textContent = F.filter((f) => aktiv(f.id)).map((f) => `${f.name.replace('Längsseite ', '')} ${R.fl[f.id].n}`).join(' · ');
+  document.getElementById('k-kwp').textContent = nf(1).format(R.kwp) + ' kWp';
+  document.getElementById('k-kwp-s').textContent = `${S.watt} Wp je Modul`;
+  document.getElementById('k-kwh').textContent = nf(0).format(R.kwh) + ' kWh';
+  document.getElementById('k-kwh-s').textContent = `Dezember ${nf(0).format(R.mon[11])} · Juli ${nf(0).format(R.mon[6])} kWh`;
+  document.getElementById('k-spez').textContent = R.kwp ? nf(0).format(R.kwh / R.kwp) : '–';
+  document.getElementById('k-wohn').textContent = nf(0).format(R.kwh / R.wohn) + ' kWh';
+  document.getElementById('k-wohn-s').textContent = `${R.wohn} Wohnungen (${hs})`;
+  document.getElementById('k-wint').textContent = R.kwh ? Math.round(wint / R.kwh * 100) + ' %' : '–';
+  const alle = S.flaechen === 'alle';
+  document.getElementById('lead').innerHTML =
+    `<b>${hs}</b>, Walmdach ${DAT.neigung}° ohne Überstand, Längsseiten nach <b>SSO (147°)</b> und NNW (327°), Walme nach SW (237°) und NO (57°). ` +
+    `Mit ${alle ? 'allen vier Flächen' : 'der SSO-Seite und dem SW-Walm'} passen <b>${R.n} Module (${nf(1).format(R.kwp)} kWp)</b> aufs Dach; ` +
+    `PVGIS erwartet mit Bergkulisse <b>${nf(0).format(R.kwh)} kWh im Jahr</b>, rund ${nf(0).format(R.kwh / R.wohn)} kWh je Wohnung. ` +
+    `Die SSO-Seite bringt ${nf(0).format(jahr('sso'))} kWh/kWp, die NNW-Seite nur ${nf(0).format(jahr('nnw'))} – im Dezember ${nf(0).format(PV.sso[11])} gegenüber ${nf(0).format(PV.nnw[11])}.`;
+  plan(R); diagramme(R); tabelle(R);
+}
+
+document.querySelectorAll('.seg[data-p]').forEach((g) => g.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
+  const k = g.dataset.p; S[k] = (k === 'rand' || k === 'watt') ? +b.dataset.v : b.dataset.v; zeichne(k === 'farbe');
+})));
+const tagE = document.getElementById('tag'), zeitE = document.getElementById('zeit');
+tagE.value = S.tag; zeitE.value = S.zeit;
+tagE.addEventListener('input', () => { S.tag = +tagE.value; zeichne(true); });
+zeitE.addEventListener('input', () => { S.zeit = +zeitE.value; zeichne(true); });
+let lauf = null;
+document.getElementById('play').addEventListener('click', (e) => {
+  if (lauf) { clearInterval(lauf); lauf = null; e.target.textContent = '▶ Tag abspielen'; return; }
+  if (S.farbe !== 'sonne') S.farbe = 'sonne';
+  S.zeit = 5; e.target.textContent = '■ Stopp';
+  lauf = setInterval(() => {
+    S.zeit += 0.25; if (S.zeit > 20) S.zeit = 5;
+    zeitE.value = S.zeit; zeichne(true);
+  }, 350);
+});
+zeichne();
+</script>
+</body></html>
