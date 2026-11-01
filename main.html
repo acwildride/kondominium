@@ -27,7 +27,7 @@
                     right: 0px;
                     width: 100%;
                     height: 100%;
-                    background-image: url('images/IMG_6499.JPEG');
+                    background-image: url('images/30d044fb-0d48-4c83-9fd8-e1f89a77eb8c.JPEG');
                     /* background-size: cover;  Cover sorgt dafür, dass das ganze Bild angezeigt wird */
                     background-position: center center;
                     background-repeat: no-repeat;
@@ -120,8 +120,15 @@
         <body>
             <div class="background-container"></div>
             <ul class="ul">
-                <li class="li"><a href="pv_kondominium2.html">PV Sim2</a></li>
-                <li class="li"><a href="pv_kondominium1.html">PV Sim1</a></li>
+                <li class="li">
+                <a href="#" class="aktiv" onclick="toggleSubmenu('submenu-2'); return false;">PV Sim</a>
+                <ul id="submenu-2" class="sub-menu">
+                    <li><a href="sonnenstrahlung.html">Sonnenstrahlung</a></li>
+                    <li><a href="dach_kondominium.html">Dach Haus A/B</a></li>
+                    <li><a href="pv_kondominium1.html" class="aktiv">Sim 1</a></li>
+                    <li><a href="pv_kondominium2.html">Sim 2</a></li>
+                </ul>
+                </li>
                 <li class="li"><a href="strom_gas_preis.html">Strom & Gaspreise</a></li>
                 <li class="li"><a href="stromverbrauch.html">Stromverbrauch</a></li>
                 <li class="li"><a href="gasverbrauch.html">Gasverbrauch</a></li>
@@ -153,7 +160,7 @@
                 Projektion Stromrechnungen 2026: 2347 €
                 Projektion Gasrechnungen 2026:   8883 €
 
-                Last updated: 01.11.2026 - 18:55
+                Last updated: 01.11.2026 - 19:01
             </p>
 
         </body>
