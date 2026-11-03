@@ -7,15 +7,6 @@
   :root { --bg:#111111; --panel:#1a1a1a; --line:#2a2f3a; --fg:#e8e8e8; --muted:#9aa0a6; --amber:#f5b83d; }
   * { box-sizing:border-box; }
   body { margin:0; background:var(--bg); color:var(--fg); font-family:system-ui,-apple-system,"Segoe UI",sans-serif; }
-  .topmenu { background:#1a1a1a; border-bottom:1px solid var(--line); padding:0 16px; position:relative; z-index:20; }
-  .topmenu .ul { list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; justify-content:flex-end; }
-  .topmenu .li { float:none !important; position:relative; }
-  .topmenu a { display:block; color:var(--fg); text-decoration:none; padding:12px 14px; font-size:14px; }
-  .topmenu a:hover { background:#2a2a2a; }
-  .topmenu a.aktiv { background:var(--fg); color:var(--bg); }
-  .topmenu .sub-menu { display:none; position:absolute; right:0; top:100%; list-style:none; margin:0; padding:4px 0;
-                       background:#1a1a1a; border:1px solid var(--line); border-radius:6px; min-width:180px; z-index:30; }
-  .topmenu .sub-menu.open { display:block; }
   .wrap { max-width:1400px; margin:0 auto; padding:24px 16px 48px; }
   h1 { font-weight:500; margin:0 0 6px; font-size:26px; }
   .lead { color:var(--muted); margin:0 0 20px; line-height:1.55; max-width:1100px; }
@@ -56,35 +47,47 @@
   @media (max-width:640px) { #p-3d { height:460px; } input[type=range] { width:160px; } }
 </style></head>
 <body>
-
-<nav class="topmenu">
-  <ul class="ul">
-    <li class="li"><a href="main.html">Home</a></li>
-    <li class="li">
-      <a href="#" onclick="toggleSubmenu('submenu-1'); return false;">Spesenabrechnung</a>
-      <ul id="submenu-1" class="sub-menu">
-        <li><a href="verlauf.html">Verlauf</a></li>
-        <li><a href="kondominiumspesen_2023.html">2023</a></li>
-        <li><a href="kondominiumspesen_2024.html">2024</a></li>
-        <li><a href="kondominiumspesen_2025.html">2025</a></li>
-      </ul>
-    </li>
-    <li class="li"><a href="oilcontrol.html">Fernablesungen</a></li>
-    <li class="li"><a href="gasverbrauch.html">Gasverbrauch</a></li>
-    <li class="li"><a href="stromverbrauch.html">Stromverbrauch</a></li>
-    <li class="li"><a href="strom_gas_preis.html">Strom &amp; Gaspreise</a></li>
-    <li class="li">
-      <a href="#" class="aktiv" onclick="toggleSubmenu('submenu-2'); return false;">PV Sim</a>
-      <ul id="submenu-2" class="sub-menu">
-        <li><a href="sonnenstrahlung.html">Sonnenstrahlung</a></li>
-        <li><a href="dach_kondominium.html" class="aktiv">Dach Haus A/B</a></li>
-        <li><a href="pv_kondominium1.html">Sim 1</a></li>
-        <li><a href="pv_kondominium2.html">Sim 2</a></li>
-      </ul>
-    </li>
-  </ul>
-</nav>
-
+<script>try{if(localStorage.getItem('agatha_ok')!=='1'&&sessionStorage.getItem('agatha_ok')!=='1')location.replace('index.html');}catch(e){}</script><style>
+.top{position:sticky;top:0;z-index:50;background:rgba(17,17,17,.92);backdrop-filter:blur(8px);border-bottom:1px solid #2a2f3a}
+.top .in{max-width:1400px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:16px;min-height:52px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#e8e8e8;font-weight:600;letter-spacing:.2px;white-space:nowrap}
+.brand .bdot{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#f5b83d,#e0663a);display:grid;place-items:center;color:#111}
+.nav{list-style:none;margin:0 0 0 auto;padding:0;display:flex;flex-wrap:wrap;justify-content:flex-end}
+.nav>li{position:relative}
+.nav a,.nav button{display:block;background:none;border:0;color:#e8e8e8;font:inherit;font-size:14px;text-decoration:none;padding:15px 12px;cursor:pointer;border-bottom:2px solid transparent}
+.nav a:hover,.nav button:hover{background:#1f1f1f}
+.nav .on>a,.nav .on>button{border-bottom-color:#f5b83d}
+.nav button::after{content:"";display:inline-block;margin-left:6px;width:6px;height:6px;border-right:1.5px solid #9aa0a6;border-bottom:1.5px solid #9aa0a6;transform:translateY(-3px) rotate(45deg)}
+.nav .sub{display:none;position:absolute;right:0;top:100%;list-style:none;margin:0;padding:6px 0;background:#1a1a1a;border:1px solid #2a2f3a;border-radius:8px;min-width:200px;box-shadow:0 10px 30px rgba(0,0,0,.45);z-index:60}
+.nav .sub a{padding:8px 14px;border:0}
+.nav .sub a.cur{color:#f5b83d}
+.nav li.open>.sub{display:block}
+@media (hover:hover){.nav li:hover>.sub{display:block}}
+.burger{display:none;margin-left:auto;background:none;border:1px solid #2a2f3a;color:#e8e8e8;border-radius:6px;padding:6px 10px;font:inherit;cursor:pointer}
+@media (max-width:860px){
+  .burger{display:block}
+  .nav{display:none;width:100%;flex-direction:column;margin:0;padding-bottom:8px}
+  .top .in{flex-wrap:wrap}
+  .top.open .nav{display:flex}
+  .nav a,.nav button{padding:10px 4px;width:100%;text-align:left}
+  .nav .sub{position:static;box-shadow:none;border:0;border-left:2px solid #2a2f3a;border-radius:0;margin-left:6px;background:transparent}
+}
+</style>
+<header class="top" id="top"><div class="in">
+  <a class="brand" href="main.html"><span class="bdot"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 4l9 7M5 10v10h14V10"/></svg></span>Residence St. Agatha</a>
+  <button class="burger" type="button" onclick="document.getElementById('top').classList.toggle('open')">Menü</button>
+  <ul class="nav"><li class=""><a href="main.html">Übersicht</a></li><li class="dd"><button type="button" aria-haspopup="true">Spesen</button><ul class="sub"><li><a href="verlauf.html">Verlauf über die Jahre</a></li><li><a href="kondominiumspesen_2025.html">Abrechnung 2025</a></li><li><a href="kondominiumspesen_2024.html">Abrechnung 2024</a></li><li><a href="kondominiumspesen_2023.html">Abrechnung 2023</a></li></ul></li><li class=""><a href="gasverbrauch.html">Gas</a></li><li class=""><a href="stromverbrauch.html">Strom</a></li><li class=""><a href="oilcontrol.html">Fernablesungen</a></li><li class=""><a href="strom_gas_preis.html">Energiepreise</a></li><li class="dd on"><button type="button" aria-haspopup="true">Photovoltaik</button><ul class="sub"><li><a href="sonnenstrahlung.html">Sonnenstrahlung</a></li><li><a href="dach_kondominium.html" class=cur>Dach Haus A/B</a></li><li><a href="pv_kondominium1.html">Simulation 1</a></li><li><a href="pv_kondominium2.html">Simulation 2</a></li></ul></li></ul>
+</div></header>
+<script>
+document.querySelectorAll('.nav .dd>button').forEach(function(b){
+  b.addEventListener('click',function(e){
+    var li=b.parentElement, offen=li.classList.contains('open');
+    document.querySelectorAll('.nav .dd.open').forEach(function(x){x.classList.remove('open')});
+    if(!offen) li.classList.add('open'); e.stopPropagation();
+  });
+});
+document.addEventListener('click',function(){document.querySelectorAll('.nav .dd.open').forEach(function(x){x.classList.remove('open')})});
+</script>
 <div class="wrap">
 <h1>Dach Haus A / B – PV-Belegung und Ertrag</h1>
 <p class="lead" id="lead"></p>
@@ -143,12 +146,11 @@
     <th>Verlegung</th><th>kWp</th><th>kWh/kWp</th><th>kWh/Jahr</th><th>Dezember</th><th>Juni</th><th>Anteil</th></tr></thead>
     <tbody id="tab"></tbody></table></div></div>
 
-<div class="card" id="annahmen"><h2>Annahmen</h2><div class="scroll"><table class="annahmen"><tr class="ah"><td colspan="2">Gebäude und Dach</td></tr><tr><td>Haus B</td><td>24,84 × 10,40 m Außenmaß, Traufhöhe 9,0 m (geschätzt, nur für das 3D-Bild), 5 Wohnungen – Plan Haus 2: 8,22 + 8,40 + 8,22 m × 10,40 m</td></tr><tr><td>Haus A</td><td>24,84 × 10,40 m Außenmaß, Traufhöhe 9,0 m (geschätzt, nur für das 3D-Bild), 6 Wohnungen – Annahme: wie Haus B, nordöstlich anschließend (Fuge 3,90 m) – bitte prüfen</td></tr><tr><td>Dachform</td><td>Walmdach, alle vier Flächen 22° (aus Fotos geschätzt), bündig ohne Dachüberstand; First = Länge − Breite; Grate im Grundriss unter 45°</td></tr><tr><td>Ausrichtung</td><td>Längsachse 57° / 237° (Kompass iPhone 58°, Gegenprobe über Sonnenstand 55°); Längsseite SSO 147°, Walm SW 237°, Walm NO 57°, Längsseite NNW 327°</td></tr><tr class="ah"><td colspan="2">Module und Belegung</td></tr><tr><td>Modul</td><td>1,722 × 1,134 m, 400, 430, 450 Wp wählbar, Fuge 2 cm</td></tr><tr><td>Belegung</td><td>Reihen parallel zur Traufe, jede Reihe so lang, wie es die Grate an ihrer Oberkante zulassen, mittig gesetzt; Randabstand zu Traufe, First und Graten wählbar (zu den Graten ×1,2 im Grundriss); „beste“ wählt je Fläche quer oder hochkant, je nachdem was mehr Module ergibt</td></tr><tr><td>Nicht berücksichtigt</td><td>Kamine, Lüftungsrohre, Dachfenster, Sat-Schüssel, Schneefang, Blitzschutz, Abstandsregeln des Installateurs; gegenseitige Verschattung der Walme von Haus A und B über die 3,90-m-Fuge; Bäume</td></tr><tr class="ah"><td colspan="2">Ertrag</td></tr><tr><td>PVGIS</td><td>SARAH3, kristallines Silizium, 1 kWp, 14 % Systemverluste, Neigung 22°, Horizont aus Geländemodell; Monatswerte: Längsseite SSO (-33°): PVdata_46.619_11.156_SA3_crystSi_1kWp_14_22deg_-33deg.csv; Walm SW (57°): PVdata_46.619_11.156_SA3_crystSi_1kWp_14_22deg_57deg.csv; Walm NO (-123°): PVdata_46.619_11.156_SA3_crystSi_1kWp_14_22deg_-123deg.csv; Längsseite NNW (147°): PVdata_46.619_11.156_SA3_crystSi_1kWp_14_22deg_147deg.csv</td></tr><tr><td>Horizont</td><td>PVGIS-Horizontprofil 46,619 N / 11,156 O (horizon_46.619_11.156.csv); bestätigt durch Fotos und Beobachtung (21.12.: Sonne gegen 14 Uhr hinter der Völlaner Seite, 21.06.: ca. 18:45 MEZ hinter dem Vigiljoch; 01.11.2026 erster Strahl 08:00)</td></tr><tr><td>Sonnenstand (Grafiken)</td><td>Näherung mit Zeitgleichung und Deklination, Zeiten in MEZ (UTC+1) ohne Sommerzeit</td></tr><tr class="ah"><td colspan="2">Grenzen</td></tr><tr><td>Genauigkeit</td><td>Modulzahlen ±10 % (Dachaufbauten, Randabstände), Erträge ±5–10 % (Jahr zu Jahr, Neigung geschätzt); keine Moduldegradation, keine Abregelung</td></tr><tr><td>Erstellt</td><td>01.11.2026 18:43 · Planungshilfe, kein Angebot</td></tr></table></div></div>
+<div class="card" id="annahmen"><h2>Annahmen</h2><div class="scroll"><table class="annahmen"><tr class="ah"><td colspan="2">Gebäude und Dach</td></tr><tr><td>Haus B</td><td>24,84 × 10,40 m Außenmaß, Traufhöhe 9,0 m (geschätzt, nur für das 3D-Bild), 5 Wohnungen – Plan Haus 2: 8,22 + 8,40 + 8,22 m × 10,40 m</td></tr><tr><td>Haus A</td><td>24,84 × 10,40 m Außenmaß, Traufhöhe 9,0 m (geschätzt, nur für das 3D-Bild), 6 Wohnungen – Annahme: wie Haus B, nordöstlich anschließend (Fuge 3,90 m) – bitte prüfen</td></tr><tr><td>Dachform</td><td>Walmdach, alle vier Flächen 22° (aus Fotos geschätzt), bündig ohne Dachüberstand; First = Länge − Breite; Grate im Grundriss unter 45°</td></tr><tr><td>Ausrichtung</td><td>Längsachse 57° / 237° (Kompass iPhone 58°, Gegenprobe über Sonnenstand 55°); Längsseite SSO 147°, Walm SW 237°, Walm NO 57°, Längsseite NNW 327°</td></tr><tr class="ah"><td colspan="2">Module und Belegung</td></tr><tr><td>Modul</td><td>1,722 × 1,134 m, 400, 430, 450 Wp wählbar, Fuge 2 cm</td></tr><tr><td>Belegung</td><td>Reihen parallel zur Traufe, jede Reihe so lang, wie es die Grate an ihrer Oberkante zulassen, mittig gesetzt; Randabstand zu Traufe, First und Graten wählbar (zu den Graten ×1,2 im Grundriss); „beste“ wählt je Fläche quer oder hochkant, je nachdem was mehr Module ergibt</td></tr><tr><td>Nicht berücksichtigt</td><td>Kamine, Lüftungsrohre, Dachfenster, Sat-Schüssel, Schneefang, Blitzschutz, Abstandsregeln des Installateurs; gegenseitige Verschattung der Walme von Haus A und B über die 3,90-m-Fuge; Bäume</td></tr><tr class="ah"><td colspan="2">Ertrag</td></tr><tr><td>PVGIS</td><td>SARAH3, kristallines Silizium, 1 kWp, 14 % Systemverluste, Neigung 22°, Horizont aus Geländemodell; Monatswerte: Längsseite SSO (-33°): PVdata_46.619_11.156_SA3_crystSi_1kWp_14_22deg_-33deg.csv; Walm SW (57°): PVdata_46.619_11.156_SA3_crystSi_1kWp_14_22deg_57deg.csv; Walm NO (-123°): PVdata_46.619_11.156_SA3_crystSi_1kWp_14_22deg_-123deg.csv; Längsseite NNW (147°): PVdata_46.619_11.156_SA3_crystSi_1kWp_14_22deg_147deg.csv</td></tr><tr><td>Horizont</td><td>PVGIS-Horizontprofil 46,619 N / 11,156 O (horizon_46.619_11.156.csv); bestätigt durch Fotos und Beobachtung (21.12.: Sonne gegen 14 Uhr hinter der Völlaner Seite, 21.06.: ca. 18:45 MEZ hinter dem Vigiljoch; 01.11.2026 erster Strahl 08:00)</td></tr><tr><td>Sonnenstand (Grafiken)</td><td>Näherung mit Zeitgleichung und Deklination, Zeiten in MEZ (UTC+1) ohne Sommerzeit</td></tr><tr class="ah"><td colspan="2">Grenzen</td></tr><tr><td>Genauigkeit</td><td>Modulzahlen ±10 % (Dachaufbauten, Randabstände), Erträge ±5–10 % (Jahr zu Jahr, Neigung geschätzt); keine Moduldegradation, keine Abregelung</td></tr><tr><td>Erstellt</td><td>03.11.2026 10:13 · Planungshilfe, kein Angebot</td></tr></table></div></div>
 </div>
 
 <script>
-function toggleSubmenu(id) { const el = document.getElementById(id); if (el) el.classList.toggle('open'); }
-const DAT = {"breite":46.619,"laenge":11.156,"neigung":22,"achse":57,"modul":[1.722,1.134],"fuge":0.02,"haeuser":[{"id":"B","name":"Haus B","L":24.84,"B":10.4,"traufe":9.0,"versatz":0.0,"wohnungen":5},{"id":"A","name":"Haus A","L":24.84,"B":10.4,"traufe":9.0,"versatz":28.74,"wohnungen":6}],"flaechen":[{"id":"sso","name":"L\u00e4ngsseite SSO","az":147,"farbe":"#f5b83d"},{"id":"sw","name":"Walm SW","az":237,"farbe":"#ef8a3d"},{"id":"no","name":"Walm NO","az":57,"farbe":"#19d3f3"},{"id":"nnw","name":"L\u00e4ngsseite NNW","az":327,"farbe":"#636efa"}],"pv":{"sso":[67.1,86.03,119.33,127.21,136.12,144.93,149.97,135.24,111.96,86.49,58.1,56.85],"sw":[49.03,75.05,108.97,119.81,128.05,135.8,139.11,127.18,103.21,79.28,47.08,42.75],"no":[23.02,40.08,76.6,100.93,120.9,133.61,135.23,111.1,79.19,48.12,24.23,17.04],"nnw":[12.6,27.65,63.95,91.71,112.47,123.92,123.85,102.25,68.67,38.66,16.18,10.31]},"horizont":[[0.0,8.4],[7.5,5.7],[15.0,4.6],[22.5,5.0],[30.0,6.9],[37.5,9.2],[45.0,10.7],[52.5,11.8],[60.0,10.7],[67.5,11.8],[75.0,13.4],[82.5,13.8],[90.0,13.0],[97.5,11.8],[105.0,10.7],[112.5,8.4],[120.0,8.0],[127.5,6.5],[135.0,4.2],[142.5,2.7],[150.0,1.9],[157.5,2.3],[165.0,6.1],[172.5,7.3],[180.0,8.4],[187.5,11.8],[195.0,10.3],[202.5,11.1],[210.0,15.3],[217.5,16.8],[225.0,15.3],[232.5,10.7],[240.0,8.4],[247.5,9.2],[255.0,11.5],[262.5,14.9],[270.0,16.4],[277.5,19.1],[285.0,21.4],[292.5,21.4],[300.0,19.1],[307.5,17.2],[315.0,16.0],[322.5,13.0],[330.0,10.7],[337.5,10.3],[345.0,9.5],[352.5,9.2],[360.0,8.4]],"beob":[["2026-11-01","08:00","erster Sonnenstrahl"]],"start":{"flaechen":"sued","verlegung":"beste","rand":0.4,"watt":430,"tag":305,"zeit":11.0}};
+const DAT = {"breite":46.619,"laenge":11.156,"neigung":22,"achse":57,"modul":[1.722,1.134],"fuge":0.02,"haeuser":[{"id":"B","name":"Haus B","L":24.84,"B":10.4,"traufe":9.0,"versatz":0.0,"wohnungen":5},{"id":"A","name":"Haus A","L":24.84,"B":10.4,"traufe":9.0,"versatz":28.74,"wohnungen":6}],"flaechen":[{"id":"sso","name":"L\u00e4ngsseite SSO","az":147,"farbe":"#f5b83d"},{"id":"sw","name":"Walm SW","az":237,"farbe":"#ef8a3d"},{"id":"no","name":"Walm NO","az":57,"farbe":"#19d3f3"},{"id":"nnw","name":"L\u00e4ngsseite NNW","az":327,"farbe":"#636efa"}],"pv":{"sso":[67.1,86.03,119.33,127.21,136.12,144.93,149.97,135.24,111.96,86.49,58.1,56.85],"sw":[49.03,75.05,108.97,119.81,128.05,135.8,139.11,127.18,103.21,79.28,47.08,42.75],"no":[23.02,40.08,76.6,100.93,120.9,133.61,135.23,111.1,79.19,48.12,24.23,17.04],"nnw":[12.6,27.65,63.95,91.71,112.47,123.92,123.85,102.25,68.67,38.66,16.18,10.31]},"horizont":[[0.0,8.4],[7.5,5.7],[15.0,4.6],[22.5,5.0],[30.0,6.9],[37.5,9.2],[45.0,10.7],[52.5,11.8],[60.0,10.7],[67.5,11.8],[75.0,13.4],[82.5,13.8],[90.0,13.0],[97.5,11.8],[105.0,10.7],[112.5,8.4],[120.0,8.0],[127.5,6.5],[135.0,4.2],[142.5,2.7],[150.0,1.9],[157.5,2.3],[165.0,6.1],[172.5,7.3],[180.0,8.4],[187.5,11.8],[195.0,10.3],[202.5,11.1],[210.0,15.3],[217.5,16.8],[225.0,15.3],[232.5,10.7],[240.0,8.4],[247.5,9.2],[255.0,11.5],[262.5,14.9],[270.0,16.4],[277.5,19.1],[285.0,21.4],[292.5,21.4],[300.0,19.1],[307.5,17.2],[315.0,16.0],[322.5,13.0],[330.0,10.7],[337.5,10.3],[345.0,9.5],[352.5,9.2],[360.0,8.4]],"beob":[["2026-11-01","08:00","erster Sonnenstrahl"]],"start":{"flaechen":"sued","verlegung":"beste","rand":0.4,"watt":430,"tag":307,"zeit":11.0}};
 const F = DAT.flaechen, HAEUSER = DAT.haeuser, PV = DAT.pv, HOR = DAT.horizont;
 const S = { haus:'B', flaechen:DAT.start.flaechen, verlegung:DAT.start.verlegung, rand:DAT.start.rand, watt:DAT.start.watt,
             farbe:'ertrag', tag:DAT.start.tag, zeit:DAT.start.zeit };
